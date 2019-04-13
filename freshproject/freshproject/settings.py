@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'userinfo'
 ]
 
 MIDDLEWARE = [
@@ -69,15 +70,25 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'freshproject.wsgi.application'
-
+# 配置session存储到Redis
+# SESSION_ENGINE = 'redis_sessions.session'
+# SESSION_REDIS_HOST = 'localhost'
+# SESSION_REDIS_PORT = 6379
+# SESSION_REDIS_DB = 0
+# SESSION_REDIS_PASSWORD = ''
+# SESSION_REDIS_PREFIX = 'session'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'fresh_db',
+        'USER': 'root',
+        'PASSWORD': 'duomi123',
+        'HOST': 'localhost',
+        'PORT': '3306'
     }
 }
 
@@ -104,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-hans'
 
 TIME_ZONE = 'UTC'
 
@@ -118,4 +129,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
+#图片用
 STATIC_URL = '/static/'
+#配置静态文件  #当调试开发模式引用静态文件时 DEBUG=True  要不找不到文件 实际在部署的时候不能这样做
+#普通文件用
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+
+]
