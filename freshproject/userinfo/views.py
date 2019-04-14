@@ -94,11 +94,13 @@ def user_center_site_handle(request):
 
     uid =request.session.get('user_id')
     user = Userinfo.objects.get(id=uid)
-    if request.method =='POST':#这里表单提交时用post 方法
-        post = request.POST
-        user.receiver = post.get('receiver')
-        user.address = post.get('addr')
-        user.postcode = post.get('postcode')
-        user.telephone = post.get('telephone')
-        user.save()
-    return  redirect('/user_center_site/',{'user':user})
+    # if request.method =='POST':#这里表单提交时用post 方法
+    post = request.POST
+    user.receiver = post.get('receiver')
+    user.address = post.get('addr')
+    user.postcode = post.get('postcode')
+    user.telephone = post.get('telephone')
+    user.save()
+    return  redirect('/user_center_site/')
+def place_order(request):
+    return render(request,'userinfo/place_order.html')
