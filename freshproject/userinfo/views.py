@@ -1,16 +1,20 @@
+
 from hashlib import sha1
 
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 
 # Create your views here.
+
+
+from userinfo import user_decorate
 from userinfo.models import Userinfo
 
 
 
 def register(request):
-
-    return render(request, 'userinfo/registerbase.html')
+    context={'title':'注册'}
+    return render(request, 'userinfo/registerbase.html',context)
 def register_handle(request):
 
     user =Userinfo()
@@ -18,10 +22,7 @@ def register_handle(request):
     user.email = request.POST.get('email')
     pwd = request.POST.get('pwd')
     ucpwd = request.POST['cpwd']
-    # if Userinfo.objects.filter(name=user.name).count():
-    #     return render(request, 'userinfo/registerbase.html', {'error_name': True})
-    # if Userinfo.objects.filter(email=user.email).count():
-    #     return render(request, 'userinfo/registerbase.html', {'error_email': True})
+
     if pwd == ucpwd :
         # 加密
         s1 = sha1()
@@ -43,10 +44,18 @@ def uemail_exist(request):
     uemail = request.GET.get('uemail')
     count = Userinfo.objects.filter(email=uemail).count()
     return JsonResponse({'count': count})
+def userexit(request):
+
+    # del request.session['user_name']
+    # del request.session['user_id']
+    request.session.flush()
+    # request.session.clear()
+    return redirect("/user/index/")
 
 def login(request):
     uname = request.COOKIES.get('uname','')
-    context = {'uname': uname,'name_error': 0, 'pwd_error': 0}
+
+    context = {'title':'登录','uname': uname,'name_error': 0, 'pwd_error': 0}
     return render(request, 'userinfo/loginbase.html',context)
 def login_handle(request):
     post= request.POST
@@ -59,8 +68,10 @@ def login_handle(request):
         s1 = sha1()
         s1.update(upwd.encode("utf8"))
         upwd2 = s1.hexdigest()
+
         if user[0].pwd == upwd2:
-            red =HttpResponseRedirect('/user_info/')# 这里不能用redirect 因为要设置cookie值 redirect继承 HttpResponseRedirect
+            user_url = request.COOKIES.get('url', '/user/index/')#没有保存的值就调到首页
+            red =HttpResponseRedirect(user_url)# 这里不能用redirect 因为要设置cookie值 redirect继承 HttpResponseRedirect
             if checkuname !=0 :
                 red.set_cookie('uname',uname)
             else:
@@ -70,26 +81,30 @@ def login_handle(request):
             return red
 
         else:
-            context={'uname':uname,'upwd':upwd,'name_error':0,'pwd_error':1}#用户名对 密码错
+            context={'title':'用户中心','uname':uname,'upwd':upwd,'name_error':0,'pwd_error':1}#用户名对 密码错
             return render(request, 'userinfo/loginbase.html', context)
 
     else:
-        context={'uname':uname,'upwd':upwd,'name_error':1,'pwd_error':0}#用户名错 密码不关心
+        context={'title':'用户中心','uname':uname,'upwd':upwd,'name_error':1,'pwd_error':0}#用户名错 密码不关心
         return render(request,'userinfo/loginbase.html',context)
 
-
+@user_decorate.login
 def user_info(request):
-    uname = request.session.get('user_name')
+    uname = request.session.get('user_name', '')
     user = Userinfo.objects.filter(name=uname).first()
-    # print(user)
-    return render(request, 'userinfo/user_center_info.html',{'user':user,'uname':uname})
+    context={'title':'用户中心','user':user}
+    return render(request, 'userinfo/user_center_info.html',context)
+@user_decorate.login
 def user_center_order(request):
-    uname = request.session.get('user_name')
-    return render(request, 'userinfo/user_center_order.html',{'uname':uname})
+
+    context={'title':'用户中心'}
+    return render(request, 'userinfo/user_center_order.html',context)
+@user_decorate.login
 def user_center_site(request):
-    uname = request.session.get('user_name')
+    uname = request.session.get('user_name', '')
     user = Userinfo.objects.filter(name=uname).first()
-    return render(request, 'userinfo/user_center_site.html',{'user':user,'uname':uname})
+    context = {'title': '用户中心', 'user':user}
+    return render(request, 'userinfo/user_center_site.html',context)
 def user_center_site_handle(request):
 
     uid =request.session.get('user_id')
@@ -102,5 +117,7 @@ def user_center_site_handle(request):
     user.telephone = post.get('telephone')
     user.save()
     return  redirect('/user_center_site/')
+@user_decorate.login
 def place_order(request):
     return render(request,'userinfo/place_order.html')
+

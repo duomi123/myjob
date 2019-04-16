@@ -1,36 +1,8 @@
-{% extends 'userinfo/base.html'%}
-<head>
-    {% block head %}
+{% extends 'userinfo/header_base.html'%}
 
-	<title>天天生鲜-提交订单</title>
-    {% endblock %}
-
-</head>
 <body>
-    {% block content %}
-    <div class="header_con">
-		<div class="header">
-			<div class="welcome fl">欢迎来到天天生鲜!</div>
-			<div class="fr">
-				<div class="login_info fl">
-					欢迎您：<em>{{ uname }}</em>
-				</div>
-				<div class="login_btn fl">
-					<a href="/login/">登录</a>
-					<span>|</span>
-					<a href="/register/">注册</a>
-				</div>
-				<div class="user_link fl">
-					<span>|</span>
-					<a href="/user_info/">用户中心</a>
-					<span>|</span>
-					<a href="cart.html">我的购物车</a>
-					<span>|</span>
-					<a href="user_center_order.html">我的订单</a>
-				</div>
-			</div>
-		</div>
-	</div>
+    {% block content1 %}
+
 	<div class="search_bar clearfix">
 		<a href="/index/" class="logo fl"><img src="/static/userinfo/images/logo.png"></a>
 		<div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;提交订单</div>

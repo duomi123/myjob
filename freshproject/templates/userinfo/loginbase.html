@@ -2,8 +2,7 @@
 <head>
 
     {% block head %}
-  	<title>天天生鲜-登录</title>
-        <script>
+     <script>
             $(function(){
                 error_name=true;
                 error_pass=true;
@@ -80,7 +79,7 @@
     {% block content %}
 
 	<div class="login_top clearfix">
-		<a href="index.html" class="login_logo"><img src="/static/userinfo/images/logo02.png"></a>
+		<a href="{% url 'homegoods:userindex' %}" class="login_logo"><img src="/static/userinfo/images/logo02.png"></a>
 	</div>
 
 	<div class="login_form_bg">
