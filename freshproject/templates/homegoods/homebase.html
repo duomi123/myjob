@@ -10,9 +10,24 @@
 			<input type="button" class="input_btn fr" name="" value="搜索">
 		</div>
 		<div class="guest_cart fr">
-			<a href="#" class="cart_name fl">我的购物车</a>
+			<a href="/user/cart/" class="cart_name fl">我的购物车</a>
 			<div class="goods_count fl" id="show_count">1</div>
 		</div>
+        <script type="text/javascript">
+            $(function () {
+                if ($('.login_btn').text().indexOf('登录')>=0)//判断是否登录
+                {
+                    $('.goods_count').html(0);//#无登录
+                }
+                else
+                {
+                    $.get('/user/cart/',function (dic) {
+                       $('.goods_count').html(dic.count);
+                    })
+                }
+
+            });
+        </script>
 	</div>
 
     {% block content2 %}

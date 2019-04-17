@@ -1,15 +1,15 @@
 from django.http import HttpResponseRedirect
 
-
+#该装饰器全页面更新才会起作用 ajax请求这里是不起作用的
 def login(func):
     def login_func(request,*args,**kwargs):
         if request.session.has_key('user_id'):
-            print('has session')
+
             return func(request,*args,**kwargs)
         else:#没有登陆则调到登陆页面
             red = HttpResponseRedirect('/login/')
             red.set_cookie('url',request.get_full_path())#保存客户进入时的路径登陆成功后，还返回以前的地方  从哪来到哪里去
-            print('no has session')
+
             return red
     return  login_func
 

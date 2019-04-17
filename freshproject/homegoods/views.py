@@ -1,4 +1,5 @@
 from django.core.paginator import Paginator
+from django.http import response
 from django.shortcuts import render
 
 # Create your views here.
@@ -48,14 +49,30 @@ def list(request,uid=1,numpage=1,sort=1):
     return render(request,'homegoods/list.html',context)
 
 def detail(request,gid=1):
-    gdatail = GoodsInfo.goodsobj.get(pk=int(gid))
-    gdatail.gclick=gdatail.gclick+1
+
+    gdatail = GoodsInfo.goodsobj.get(id=int(gid))
+    gdatail.gclick=gdatail.gclick+1#维护一个点击量
     gdatail.save()
     gtype = TypeInfo.typeobj.get(pk=gdatail.goodstype_id)
-    # goodstype = gdatail.title
     goods_news = GoodsInfo.goodsobj.filter(goodstype_id=gdatail.goodstype_id).order_by('-id')[0:2]  # 新品推荐
-
     context = {'title': '商品详情',
                'gtype': gtype, 'goods_news': goods_news,'gdatail': gdatail}
+    response = render(request, 'homegoods/detail.html', context)
 
-    return render(request, 'homegoods/detail.html', context)
+    #维护用户对商品的浏览记录
+    # goodsid = '%d'%gid#把整数变为字符串
+    goodsid=gid
+    goodsids = request.COOKIES.get('goodsids','')
+    if goodsids != '':                    #判断是否有浏览记录
+        goodsid_list = goodsids.split(',')#将字符串以'，'拆分为列表
+        if  goodsid_list.count(goodsid)>=1:#该商品已经在最近浏览列表里 则删除
+            goodsid_list.remove(goodsid)
+        goodsid_list.insert(0,goodsid) #添加到第一个
+        if len(goodsid_list)>=6: #判断商品是否已经多于六个  多了则删除最后一个
+            del goodsid_list[5]
+        goodsids=','.join(goodsid_list) #将列表值拼接为字符串
+    else:
+        goodsids = goodsid#没有则直接添加
+    response.set_cookie('goodsids',goodsids) #写入cookie
+    return response
+

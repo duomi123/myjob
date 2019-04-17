@@ -5,8 +5,7 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 
 # Create your views here.
-
-
+from homegoods.models import GoodsInfo
 from userinfo import user_decorate
 from userinfo.models import Userinfo
 
@@ -53,9 +52,8 @@ def userexit(request):
     return redirect("/user/index/")
 
 def login(request):
-    uname = request.COOKIES.get('uname','')
 
-    context = {'title':'登录','uname': uname,'name_error': 0, 'pwd_error': 0}
+    context = {'title':'登录','name_error': 0, 'pwd_error': 0}
     return render(request, 'userinfo/loginbase.html',context)
 def login_handle(request):
     post= request.POST
@@ -90,9 +88,16 @@ def login_handle(request):
 
 @user_decorate.login
 def user_info(request):
-    uname = request.session.get('user_name', '')
-    user = Userinfo.objects.filter(name=uname).first()
-    context={'title':'用户中心','user':user}
+    uid = request.session.get('user_id', '')
+    user = Userinfo.objects.get(id=uid)
+    goodsids = request.COOKIES.get('goodsids', '')
+    goodsinfo = []
+    if goodsids != '':
+        goodsid_list = goodsids.split(',')
+        for goodsid in goodsid_list:
+            goodsinfo.append(GoodsInfo.goodsobj.get(id=int(goodsid)))  # 按浏览顺序查商品信息 进行5次操作
+
+    context={'title':'用户中心','user':user,'goodsinfo':goodsinfo}
     return render(request, 'userinfo/user_center_info.html',context)
 @user_decorate.login
 def user_center_order(request):
@@ -101,8 +106,8 @@ def user_center_order(request):
     return render(request, 'userinfo/user_center_order.html',context)
 @user_decorate.login
 def user_center_site(request):
-    uname = request.session.get('user_name', '')
-    user = Userinfo.objects.filter(name=uname).first()
+    uid = request.session.get('user_id', '')
+    user = Userinfo.objects.get(id=uid)
     context = {'title': '用户中心', 'user':user}
     return render(request, 'userinfo/user_center_site.html',context)
 def user_center_site_handle(request):

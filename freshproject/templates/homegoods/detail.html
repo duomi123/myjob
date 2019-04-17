@@ -12,7 +12,7 @@
 		<a href="#">商品详情</a>
 	</div>
 
-	<div class="goods_detail_con clearfix">
+	<div class="goods_detail_con clearfix" id={{ gdatail.id }}>
 		<div class="goods_detail_pic fl"><img src="/static/{{ gdatail.gpic }}"></div>
 
 		<div class="goods_detail_list fr">
@@ -32,8 +32,8 @@
 			</div>
 			<div class="total">总价：<em>{% widthratio gdatail.gprice 1 1%}元</em></div>
 			<div class="operate_btn">
-				<a href="javascript:;" class="buy_btn">立即购买</a>
-				<a href="javascript:;" class="add_cart" id="add_cart">加入购物车</a>				
+				<a href="javascript:" class="buy_btn">立即购买</a>
+				<a href="javascript:" class="add_cart" id="add_cart">加入购物车</a>
 			</div>
 		</div>
 	</div>
@@ -70,10 +70,8 @@
 		</div>
 	</div>
 
-
 	<div class="add_jump"></div>
 
-	<script type="text/javascript" src="js/jquery-1.12.2.js"></script>
 	<script type="text/javascript">
 		var $add_x = $('#add_cart').offset().top;
 		var $add_y = $('#add_cart').offset().left;
@@ -83,15 +81,28 @@
 
 		$(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'})
 		$('#add_cart').click(function(){
+
+            if ($('.login_btn').text().indexOf('登录')>=1)
+            {
+                alert('请先登录，再购买！');
+                location.href='/login/';
+                return
+            }
+            //动画
 			$(".add_jump").stop().animate({
 				'left': $to_y+7,
 				'top': $to_x+7},
 				"fast", function() {
 					$(".add_jump").fadeOut('fast',function(){
-						$('#show_count').html(2);
 					});
 
 			});
+            //异步
+            var gid = $('.goods_detail_con').attr('id');
+            var gcounts = parseInt($(".num_show").val());
+             $.get('/user/add_'+gid+'_'+gcounts+'/',function (dic) {
+                $('.goods_count').text(dic.count);
+            })
 		})
 
 	</script>
@@ -100,18 +111,18 @@
             $('.num_show').blur(function() {
                 var totals=0;
                 counts = parseInt($('.num_show').val());
-                if(counts<0)       <!-- #防止用户输入小数或者负数 -->
+                if(counts<=0)       <!-- #防止用户输入小数或者负数 -->
                 { counts=1;}
                 $('.num_show').val(counts);
-                totals = counts*100*{{ gdatail.gprice }}/100;
+                totals = counts*100*$('.prize_bar').find('em').text()/100;
                 $('.total em').html(totals+'元').show();
             });
             $('.add').click(function() {
                 var totals=0;
                 counts = parseFloat($('.num_show').val())+1;
                 $('.num_show').val(counts);
-                totals = parseFloat(counts)*100*{{ gdatail.gprice }}/100;
-                $('.total em').html(totals+'元').show();
+                totals = parseFloat(counts)*100*$('.prize_bar').find('em').text()/100;
+                $('.total em').html(totals.toFixed(2)+'元').show();
             });
              $('.minus').click(function() {
                 var totals=0;
@@ -121,14 +132,13 @@
                 {
                     counts-=1;
                     $('.num_show').val(counts);
-                    totals = parseFloat(counts)*100*{{ gdatail.gprice }}/100;
-                    $('.total em').html(totals+'元').show();
+                    totals = parseFloat(counts)*100*$('.prize_bar').find('em').text()/100;
+                    $('.total em').text(totals.toFixed(2)+'元').show();
                 }
                 else
                     return;
 
             });
-
 
         </script>
 	{% endblock %}
