@@ -21,4 +21,5 @@ urlpatterns = [
     path(r'', include('userinfo.urls')),
     path(r'user/', include('homegoods.urls',namespace='homegoods')),
     path(r'user/', include('carts.urls',namespace='carts')),
+    path(r'user/', include('order.urls',namespace='order')),
 ]

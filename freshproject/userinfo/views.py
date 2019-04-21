@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect
 
 # Create your views here.
 from homegoods.models import GoodsInfo
+from order.models import OrderInfo, OrderProduct
 from userinfo import user_decorate
 from userinfo.models import Userinfo
 
@@ -101,13 +102,16 @@ def user_info(request):
     return render(request, 'userinfo/user_center_info.html',context)
 @user_decorate.login
 def user_center_order(request):
-
+    uid = request.session.get('user_id', '')
+    # order = OrderInfo.objects.get(user_id=uid)
+    # orderproduct= OrderProduct.objects.get(order_info_id=order.id)
     context={'title':'用户中心'}
     return render(request, 'userinfo/user_center_order.html',context)
 @user_decorate.login
 def user_center_site(request):
     uid = request.session.get('user_id', '')
     user = Userinfo.objects.get(id=uid)
+
     context = {'title': '用户中心', 'user':user}
     return render(request, 'userinfo/user_center_site.html',context)
 def user_center_site_handle(request):

@@ -30,6 +30,7 @@
 					<a href="javascript:;" class="minus fr">-</a>	
 				</div> 
 			</div>
+            <div class="total_count">总库存：<em>{{ gdatail.gkucun }}</em></div>
 			<div class="total">总价：<em>{% widthratio gdatail.gprice 1 1%}元</em></div>
 			<div class="operate_btn">
 				<a href="javascript:" class="buy_btn">立即购买</a>
@@ -98,8 +99,13 @@
 
 			});
             //异步
-            var gid = $('.goods_detail_con').attr('id');
             var gcounts = parseInt($(".num_show").val());
+            if(gcounts>$('.total_count em').text()){
+                alert('库存不足，请选择合适的数量！');
+                return
+            }
+            var gid = $('.goods_detail_con').attr('id');
+
              $.get('/user/add_'+gid+'_'+gcounts+'/',function (dic) {
                 $('.goods_count').text(dic.count);
             })

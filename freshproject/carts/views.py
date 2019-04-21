@@ -38,3 +38,30 @@ def add(request,gid,gcounts):
         return JsonResponse(context)
     else:
         return redirect('/user/cart/') # 返回购物车
+@user_decorate.login
+def delete(request,cartid):
+    try:
+        cart = CartsInfo.objects.get(id=int(cartid))
+        cart.delete()
+        context= {"ok":0}
+    except Exception as ex:
+        context = {"ok": 1}
+        print(ex)
+    if  request.is_ajax() :
+        return JsonResponse(context)
+    else:
+        return redirect('/user/cart/') # 返回购物车
+@user_decorate.login
+def edit(request,cartid,cartcounts):
+    try:
+        cart = CartsInfo.objects.get(id=int(cartid))
+        cart.counts = int(cartcounts)
+        cart.save()
+        context= {"ok":0}
+    except Exception as ex:
+        context = {"ok": int(cartcounts)}
+        print(ex)
+    if  request.is_ajax() :
+        return JsonResponse(context)
+    else:
+        return redirect('/user/cart/') # 返回购物车
